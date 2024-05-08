@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:prototype1/nav.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+void launchPhone(String phoneNumber) async {
+  String url = 'tel:$phoneNumber';
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'No se pudo realizar la llamada a $url';
+  }
+}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -77,7 +87,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           Column(
                             children: [
                               IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  launchPhone('+56997082364');
+                                },
                                 icon: const Icon(Icons.person,
                                     size: 40), // Aumenta el tamaño del icono
                               ),
@@ -127,38 +139,54 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         // content: Text('Esta es una ventana flotante.'),
                         actions: <Widget>[
-                          Column(
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              IconButton(
-                                onPressed: () {},
-                                icon: const Icon(Icons.report,
-                                    size: 40), // Aumenta el tamaño del icono
+                              Column(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(Icons.report,
+                                        size:
+                                            40), // Aumenta el tamaño del icono
+                                  ),
+                                  const SizedBox(
+                                      height:
+                                          8), // Espacio entre el icono y el texto
+                                  const Text('Reporte 1',
+                                      style: TextStyle(fontSize: 20)),
+                                  Column(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: const Icon(Icons.report,
+                                            size:
+                                                40), // Aumenta el tamaño del icono
+                                      ),
+                                      const SizedBox(
+                                          height:
+                                              8), // Espacio entre el icono y el texto
+                                      const Text('Reporte 2',
+                                          style: TextStyle(fontSize: 20)),
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: const Icon(Icons.report,
+                                            size:
+                                                40), // Aumenta el tamaño del icono
+                                      ),
+                                      const SizedBox(
+                                          height:
+                                              8), // Espacio entre el icono y el texto
+                                      const Text('Reporte 3',
+                                          style: TextStyle(fontSize: 20)),
+                                    ],
+                                  ),
+                                ],
                               ),
-                              const SizedBox(
-                                  height:
-                                      8), // Espacio entre el icono y el texto
-                              const Text('Reporte 1',
-                                  style: TextStyle(fontSize: 20)),
-                              IconButton(
-                                onPressed: () {},
-                                icon: const Icon(Icons.report,
-                                    size: 40), // Aumenta el tamaño del icono
-                              ),
-                              const SizedBox(
-                                  height:
-                                      8), // Espacio entre el icono y el texto
-                              const Text('Reporte 2',
-                                  style: TextStyle(fontSize: 20)),
-                              IconButton(
-                                onPressed: () {},
-                                icon: const Icon(Icons.report,
-                                    size: 40), // Aumenta el tamaño del icono
-                              ),
-                              const SizedBox(
-                                  height:
-                                      8), // Espacio entre el icono y el texto
-                              const Text('Reporte 3',
-                                  style: TextStyle(fontSize: 20)),
                             ],
                           ),
                           TextButton(
