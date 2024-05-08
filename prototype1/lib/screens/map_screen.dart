@@ -1,93 +1,40 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:prototype1/screens/account_screen.dart';
-import 'package:prototype1/screens/settings_screen.dart';
-import 'package:prototype1/screens/help_screen.dart';
+import 'package:prototype1/nav.dart';
 
-class Map extends StatelessWidget {
-  Map({
-    super.key,
-    required CameraPosition cameraPosition,
-    required Completer<GoogleMapController> controller,
-  })  : _cameraPosition = cameraPosition,
-        _controller = controller;
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
 
-  final CameraPosition _cameraPosition;
-  final Completer<GoogleMapController> _controller;
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  late GoogleMapController mapController;
+
+  final LatLng _center = const LatLng(-29.9053048, -71.2634563);
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Nombre App'),
-        backgroundColor: Color.fromARGB(100, 239, 66, 124),
+        title: const Text('Nombre App'),
+        backgroundColor: const Color.fromARGB(100, 239, 66, 124),
       ),
-      drawer: Drawer(
-        // Agregamos un Drawer para la navegación desplegable
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Color.fromARGB(100, 239, 66, 124),
-              ),
-              child: Text('Menú'),
-            ),
-            ListTile(
-              leading: Icon(Icons.map),
-              title: Text('Mapa'),
-              onTap: () {
-                // Acción cuando se selecciona la opción 1
-                Navigator.pop(context); // Cierra el Drawer
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.person_2),
-              title: Text('Cuenta'),
-              onTap: () {
-                // Acción cuando se selecciona la opción 2
-                Navigator.pop(context); // Cierra el Drawer
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Cuenta()),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Ajustes'),
-              onTap: () {
-                // Acción cuando se selecciona la opción 3
-                Navigator.pop(context); // Cierra el Drawer
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Ajustes()),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.help),
-              title: Text('Ayuda'),
-              onTap: () {
-                // Acción cuando se selecciona la opción 4
-                Navigator.pop(context); // Cierra el Drawer
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Ayuda()),
-                );
-              },
-            ),
-            // Puedes agregar más ListTile para más opciones
-          ],
-        ),
-      ),
+      drawer: MainDrawer(),
       body: GoogleMap(
         zoomControlsEnabled: false,
-        initialCameraPosition: _cameraPosition,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-        },
+        onMapCreated: _onMapCreated,
+        initialCameraPosition: CameraPosition(
+          target: _center,
+          zoom: 11.0,
+        ),
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -97,28 +44,28 @@ class Map extends StatelessWidget {
             heroTag:
                 'shareButton', // Asigna una etiqueta única para el botón de compartir
             onPressed: () {},
-            child: Icon(Icons.share),
+            child: const Icon(Icons.share),
           ),
-          SizedBox(height: 16), // Espacio entre los botones flotantes
+          const SizedBox(height: 16), // Espacio entre los botones flotantes
           FloatingActionButton(
             heroTag:
                 'sosButton', // Asigna una etiqueta única para el botón de SOS
             onPressed: () {},
-            child: Icon(Icons.sos),
+            child: const Icon(Icons.sos),
           ),
-          SizedBox(height: 16), // Espacio entre los botones flotantes
+          const SizedBox(height: 16), // Espacio entre los botones flotantes
           FloatingActionButton(
             heroTag:
                 'helpButton', // Asigna una etiqueta única para el botón de ayuda
             onPressed: () {},
-            child: Icon(Icons.help),
+            child: const Icon(Icons.help),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
                 onPressed: () {},
-                child: Text('REPORTE', style: TextStyle(fontSize: 20)),
+                child: const Text('REPORTE', style: TextStyle(fontSize: 20)),
               ),
             ],
           ),
