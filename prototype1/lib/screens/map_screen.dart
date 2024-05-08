@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:test02/screens/account_screen.dart';
-import 'package:test02/screens/settings_screen.dart';
-import 'package:test02/screens/help_screen.dart';
+import 'package:prototype1/screens/account_screen.dart';
+import 'package:prototype1/screens/settings_screen.dart';
+import 'package:prototype1/screens/help_screen.dart';
 
 class Map extends StatelessWidget {
   Map({

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:test02/screens/help_screen.dart';
-import 'package:test02/screens/account_screen.dart';
+import 'package:prototype1/screens/help_screen.dart';
+import 'package:prototype1/screens/account_screen.dart';
 
 class Ajustes extends StatelessWidget {
   const Ajustes({super.key});

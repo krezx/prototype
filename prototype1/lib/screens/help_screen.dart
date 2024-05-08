@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:test02/screens/settings_screen.dart';
-import 'package:test02/screens/help_screen.dart';
+import 'package:prototype1/screens/account_screen.dart';
+import 'package:prototype1/screens/settings_screen.dart';
 
-class Cuenta extends StatelessWidget {
-  const Cuenta({super.key});
+class Ayuda extends StatelessWidget {
+  const Ayuda({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -11,11 +11,11 @@ class Cuenta extends StatelessWidget {
       title: 'Material App',
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Cuenta'),
+          title: Text('Ayuda'),
           backgroundColor: Color.fromARGB(100, 239, 66, 124),
         ),
         body: const Center(
-          child: Text('Informacion de la cuenta...'),
+          child: Text('Información de Ayuda'),
         ),
         drawer: Drawer(
           // Agregamos un Drawer para la navegación desplegable
