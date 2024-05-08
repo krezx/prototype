@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:prototype1/nav.dart';
+import 'package:geolocator/geolocator.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -13,11 +14,30 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late GoogleMapController mapController;
+  late Position currentPosition;
 
-  final LatLng _center = const LatLng(-29.9053048, -71.2634563);
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    mapController.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(
+        target: LatLng(currentPosition.latitude, currentPosition.longitude),
+        zoom: 15.0,
+      ),
+    ));
+  }
+
+  Future<void> _getCurrentLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      currentPosition = position;
+    });
   }
 
   @override
@@ -31,10 +51,12 @@ class _MyHomePageState extends State<MyHomePage> {
       body: GoogleMap(
         zoomControlsEnabled: false,
         onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: _center,
+        initialCameraPosition: const CameraPosition(
+          target: LatLng(-29.9053048, -71.2634563),
           zoom: 11.0,
         ),
+        myLocationButtonEnabled: true,
+        myLocationEnabled: true,
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
