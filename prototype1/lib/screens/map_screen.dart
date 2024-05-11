@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:prototype1/nav.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -19,7 +20,17 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
+    _requestLocationPermission();
+  }
+
+  Future<void> _requestLocationPermission() async {
+    final status = await Permission.location.request();
+    if (status == PermissionStatus.granted) {
+      _getCurrentLocation();
+    } else {
+      // Handle denied or restricted permission
+      // Puedes mostrar un diálogo o un mensaje al usuario aquí
+    }
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -53,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onMapCreated: _onMapCreated,
         initialCameraPosition: const CameraPosition(
           target: LatLng(-29.9053048, -71.2634563),
-          zoom: 11.0,
+          zoom: 15.0,
         ),
         myLocationButtonEnabled: true,
         myLocationEnabled: true,
