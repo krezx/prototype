@@ -72,7 +72,58 @@ class _MyHomePageState extends State<MyHomePage> {
           FloatingActionButton(
             heroTag:
                 'sosButton', // Asigna una etiqueta única para el botón de SOS
-            onPressed: () {},
+            onPressed: () {
+              // Mostrar la ventana flotante cuando se presione el botón
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('LLAMADA DE EMERGENCIA'),
+                    actions: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.local_police, size: 40),
+                                // Aumenta el tamaño del icono
+                              ),
+                              const SizedBox(
+                                  height:
+                                      2), // Espacio entre el icono y el texto
+                              const Text('133', style: TextStyle(fontSize: 20)),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.person,
+                                    size: 40), // Aumenta el tamaño del icono
+                              ),
+                              const SizedBox(
+                                  height:
+                                      2), // Espacio entre el icono y el texto
+                              const Text('Contacto',
+                                  style: TextStyle(fontSize: 20)),
+                            ],
+                          ),
+                        ],
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          // Cerrar la ventana flotante cuando se presione el botón "Cerrar"
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Cerrar'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
             child: const Icon(Icons.sos),
           ),
           const SizedBox(height: 16), // Espacio entre los botones flotantes
@@ -86,7 +137,64 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  // Mostrar la ventana flotante cuando se presione el botón
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text(
+                          'REPORTE',
+                          textAlign: TextAlign.center,
+                        ),
+                        // content: Text('Esta es una ventana flotante.'),
+                        actions: <Widget>[
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.report,
+                                    size: 40), // Aumenta el tamaño del icono
+                              ),
+                              const SizedBox(
+                                  height:
+                                      8), // Espacio entre el icono y el texto
+                              const Text('Reporte 1',
+                                  style: TextStyle(fontSize: 20)),
+                              IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.report,
+                                    size: 40), // Aumenta el tamaño del icono
+                              ),
+                              const SizedBox(
+                                  height:
+                                      8), // Espacio entre el icono y el texto
+                              const Text('Reporte 2',
+                                  style: TextStyle(fontSize: 20)),
+                              IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.report,
+                                    size: 40), // Aumenta el tamaño del icono
+                              ),
+                              const SizedBox(
+                                  height:
+                                      8), // Espacio entre el icono y el texto
+                              const Text('Reporte 3',
+                                  style: TextStyle(fontSize: 20)),
+                            ],
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              // Cerrar la ventana flotante cuando se presione el botón "Cerrar"
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Cerrar'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
                 child: const Text('REPORTE', style: TextStyle(fontSize: 20)),
               ),
             ],
