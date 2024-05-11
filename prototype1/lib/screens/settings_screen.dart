@@ -16,7 +16,7 @@ class Ajustes extends StatelessWidget {
         body: const Center(
           child: Text('Ajustes de la aplicación...'),
         ),
-        drawer: MainDrawer(),
+        drawer: const MainDrawer(),
       ),
     );
   }

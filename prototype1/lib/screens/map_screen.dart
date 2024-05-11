@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:prototype1/nav.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -20,20 +19,23 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _requestLocationPermission();
   }
 
-  Future<void> _requestLocationPermission() async {
-    final status = await Permission.location.request();
-    if (status == PermissionStatus.granted) {
-      _getCurrentLocation();
-    } else {
-      // Handle denied or restricted permission
-      // Puedes mostrar un diálogo o un mensaje al usuario aquí
+  Future<Position> _determinePosition() async {
+    LocationPermission permission;
+    permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('error');
+      }
     }
+    return await Geolocator.getCurrentPosition();
   }
 
-  void _onMapCreated(GoogleMapController controller) {
+  void _onMapCreated(GoogleMapController controller) async {
+    currentPosition = await _determinePosition();
     mapController = controller;
     mapController.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(
@@ -43,12 +45,8 @@ class _MyHomePageState extends State<MyHomePage> {
     ));
   }
 
-  Future<void> _getCurrentLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    setState(() {
-      currentPosition = position;
-    });
+  void _getCurrentLocation() async {
+    currentPosition = await _determinePosition();
   }
 
   @override
@@ -58,16 +56,16 @@ class _MyHomePageState extends State<MyHomePage> {
         title: const Text('Nombre App'),
         backgroundColor: const Color.fromARGB(100, 239, 66, 124),
       ),
-      drawer: MainDrawer(),
+      drawer: const MainDrawer(),
       body: GoogleMap(
         zoomControlsEnabled: false,
         onMapCreated: _onMapCreated,
+        myLocationEnabled: true,
+        myLocationButtonEnabled: true,
         initialCameraPosition: const CameraPosition(
           target: LatLng(-29.9053048, -71.2634563),
           zoom: 15.0,
         ),
-        myLocationButtonEnabled: true,
-        myLocationEnabled: true,
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,

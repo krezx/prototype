@@ -5,6 +5,7 @@ import 'package:prototype1/screens/help_screen.dart';
 import 'package:prototype1/screens/map_screen.dart';
 
 class MainDrawer extends StatelessWidget {
+  const MainDrawer({super.key});
   @override
   Widget build(BuildContext context) {
     return Drawer(
