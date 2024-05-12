@@ -13,7 +13,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 _callNumber() async {
-  const number = '9 92325997';
+  const number = '9 30023656';
   bool? res = await FlutterPhoneDirectCaller.callNumber(number);
 }
 
