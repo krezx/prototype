@@ -264,6 +264,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  sensors:
+    dependency: "direct main"
+    description:
+      name: sensors
+      sha256: "69c10fe94a63dd7c6f5e6557366e5329a713bf6c45d885d95a56642dd8722e35"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.3"
   sensors_plus:
     dependency: "direct main"
     description:
@@ -280,6 +288,38 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  shake_gesture:
+    dependency: "direct main"
+    description:
+      name: shake_gesture
+      sha256: e6e6f77670617dd2a58552cfa4a0325f47d5b5b1942fa9f26691dad26f2c2978
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.5"
+  shake_gesture_android:
+    dependency: transitive
+    description:
+      name: shake_gesture_android
+      sha256: acb0ce9226ae4d3d3c187e15ec465025415c0d6d76fe835b08c855dd66bf4894
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.2"
+  shake_gesture_ios:
+    dependency: transitive
+    description:
+      name: shake_gesture_ios
+      sha256: dd7d5a89587f3696d2abe45d35c350e9986ebaa723538892e6da91d4c7e092d5
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
+  shake_gesture_platform_interface:
+    dependency: transitive
+    description:
+      name: shake_gesture_platform_interface
+      sha256: c5e9adef94892c16e030aabd2c480620cac4dfc002f397309e796248a2a397cc
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   sky_engine:
     dependency: transitive
     description: flutter

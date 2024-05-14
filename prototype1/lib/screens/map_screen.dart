@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:prototype1/nav.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:sensors/sensors.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -12,61 +13,67 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+bool _ventanaSosAbierta = false;
+
 _callNumber() async {
   const number = '9 30023656';
   bool? res = await FlutterPhoneDirectCaller.callNumber(number);
 }
 
 dynamic ventanaSos(BuildContext context) {
-  // Mostrar la ventana flotante cuando se presione el botón
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('LLAMADA DE EMERGENCIA'),
-        actions: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Column(
-                children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.local_police, size: 40),
-                    // Aumenta el tamaño del icono
-                  ),
-                  const SizedBox(
-                      height: 2), // Espacio entre el icono y el texto
-                  const Text('133', style: TextStyle(fontSize: 20)),
-                ],
-              ),
-              Column(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      _callNumber();
-                    },
-                    icon: const Icon(Icons.person,
-                        size: 40), // Aumenta el tamaño del icono
-                  ),
-                  const SizedBox(
-                      height: 2), // Espacio entre el icono y el texto
-                  const Text('Contacto', style: TextStyle(fontSize: 20)),
-                ],
-              ),
-            ],
-          ),
-          TextButton(
-            onPressed: () {
-              // Cerrar la ventana flotante cuando se presione el botón "Cerrar"
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cerrar'),
-          ),
-        ],
-      );
-    },
-  );
+  if (!_ventanaSosAbierta) {
+    _ventanaSosAbierta = true;
+    // Mostrar la ventana flotante cuando se presione el botón
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('LLAMADA DE EMERGENCIA'),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Column(
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.local_police, size: 40),
+                      // Aumenta el tamaño del icono
+                    ),
+                    const SizedBox(
+                        height: 2), // Espacio entre el icono y el texto
+                    const Text('133', style: TextStyle(fontSize: 20)),
+                  ],
+                ),
+                Column(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        _callNumber();
+                      },
+                      icon: const Icon(Icons.person,
+                          size: 40), // Aumenta el tamaño del icono
+                    ),
+                    const SizedBox(
+                        height: 2), // Espacio entre el icono y el texto
+                    const Text('Contacto', style: TextStyle(fontSize: 20)),
+                  ],
+                ),
+              ],
+            ),
+            TextButton(
+              onPressed: () {
+                // Cerrar la ventana flotante cuando se presione el botón "Cerrar"
+                _ventanaSosAbierta = false;
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -76,6 +83,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Configura el listener para detectar la sacudida
+    accelerometerEvents.listen((AccelerometerEvent event) {
+      if (!_ventanaSosAbierta &&
+          (event.x.abs() > 20 || event.y.abs() > 20 || event.z.abs() > 20)) {
+        ventanaSos(context);
+      }
+    });
   }
 
   @override

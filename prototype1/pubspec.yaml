@@ -39,6 +39,8 @@ dependencies:
   google_maps_flutter: ^2.6.1
   flutter_phone_direct_caller: ^2.1.1
   sensors_plus: ^5.0.1
+  shake_gesture: ^1.0.5
+  sensors: ^2.0.3
 
 dev_dependencies:
   flutter_test:
