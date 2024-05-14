@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:prototype1/nav.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:sensors/sensors.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -21,6 +22,8 @@ _callNumber() async {
 }
 
 dynamic ventanaSos(BuildContext context) {
+  AudioPlayer audioPlayer = AudioPlayer();
+  audioPlayer.play(AssetSource('audio/sos-43210.mp3'));
   if (!_ventanaSosAbierta) {
     _ventanaSosAbierta = true;
     // Mostrar la ventana flotante cuando se presione el botón
@@ -65,6 +68,7 @@ dynamic ventanaSos(BuildContext context) {
               onPressed: () {
                 // Cerrar la ventana flotante cuando se presione el botón "Cerrar"
                 _ventanaSosAbierta = false;
+                audioPlayer.stop();
                 Navigator.of(context).pop();
               },
               child: const Text('Cerrar'),
@@ -110,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onMapCreated: _onMapCreated,
         initialCameraPosition: CameraPosition(
           target: _center,
-          zoom: 11.0,
+          zoom: 14.0,
         ),
       ),
       floatingActionButton: Column(
