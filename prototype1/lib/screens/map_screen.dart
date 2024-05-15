@@ -15,7 +15,33 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+class ActionWidget extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const ActionWidget({Key? key, required this.icon, required this.label})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        children: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(icon, size: 30),
+          ),
+          const SizedBox(height: 8),
+          Text(label, style: const TextStyle(fontSize: 15)),
+        ],
+      ),
+    );
+  }
+}
+
 bool _ventanaSosAbierta = false;
+int count = 0;
 
 _callNumber() async {
   const number = '9 30023656';
@@ -24,8 +50,9 @@ _callNumber() async {
 
 dynamic ventanaSos(BuildContext context) {
   AudioPlayer audioPlayer = AudioPlayer();
-  audioPlayer.play(AssetSource('audio/sos-43210.mp3'));
   if (!_ventanaSosAbierta) {
+    audioPlayer.play(AssetSource('audio/sos-43210.mp3'));
+    count = 0;
     _ventanaSosAbierta = true;
     // Mostrar la ventana flotante cuando se presione el botón
     showDialog(
@@ -88,6 +115,21 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    // Configura el listener para detectar la sacudida
+    int temp = 0;
+    accelerometerEvents.listen((AccelerometerEvent event) {
+      temp++;
+      if (!_ventanaSosAbierta &&
+          (event.x.abs() > 30 || event.y.abs() > 30 || event.z.abs() > 30)) {
+        print(count);
+        count++;
+      }
+      if (temp == 200) {
+        count = 0;
+        temp = 0;
+      }
+      if (count == 30) ventanaSos(context);
+    });
   }
 
   Future<Position> _determinePosition() async {
@@ -119,22 +161,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    // Configura el listener para detectar la sacudida
-    accelerometerEvents.listen((AccelerometerEvent event) {
-      if (!_ventanaSosAbierta &&
-          (event.x.abs() > 20 || event.y.abs() > 20 || event.z.abs() > 20)) {
-        ventanaSos(context);
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nombre App'),
+        title: const Text('Camina Conmigo'),
         backgroundColor: const Color.fromARGB(100, 239, 66, 124),
       ),
       drawer: const MainDrawer(),
@@ -188,64 +218,65 @@ class _MyHomePageState extends State<MyHomePage> {
                           'REPORTE',
                           textAlign: TextAlign.center,
                         ),
-                        // content: Text('Esta es una ventana flotante.'),
-                        actions: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                        content: const SingleChildScrollView(
+                          child: Column(
                             children: [
-                              Column(
+                              Row(
                                 children: [
-                                  IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.report,
-                                        size:
-                                            40), // Aumenta el tamaño del icono
-                                  ),
-                                  const SizedBox(
-                                      height:
-                                          8), // Espacio entre el icono y el texto
-                                  const Text('Reporte 1',
-                                      style: TextStyle(fontSize: 20)),
                                   Column(
                                     children: [
-                                      IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.report,
-                                            size:
-                                                40), // Aumenta el tamaño del icono
-                                      ),
-                                      const SizedBox(
-                                          height:
-                                              8), // Espacio entre el icono y el texto
-                                      const Text('Reporte 2',
-                                          style: TextStyle(fontSize: 20)),
+                                      ActionWidget(
+                                          icon: Icons.report,
+                                          label: 'Agresión\n Verbal'),
+                                      ActionWidget(
+                                          icon: Icons.report,
+                                          label: 'Agresión\n Física'),
+                                      ActionWidget(
+                                          icon: Icons.report,
+                                          label: 'Poca\n Iluminación'),
+                                      ActionWidget(
+                                          icon: Icons.report,
+                                          label: 'Espacios\n Abandonados'),
+                                      ActionWidget(
+                                          icon: Icons.report,
+                                          label: 'Puntos\n Ciegos'),
+                                      ActionWidget(
+                                          icon: Icons.report,
+                                          label: 'Falta de\n baños\n públicos'),
                                     ],
                                   ),
                                   Column(
                                     children: [
-                                      IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.report,
-                                            size:
-                                                40), // Aumenta el tamaño del icono
-                                      ),
-                                      const SizedBox(
-                                          height:
-                                              8), // Espacio entre el icono y el texto
-                                      const Text('Reporte 3',
-                                          style: TextStyle(fontSize: 20)),
+                                      ActionWidget(
+                                          icon: Icons.report,
+                                          label: 'Mobiliario\n Inadecuado'),
+                                      ActionWidget(
+                                          icon: Icons.report,
+                                          label: 'Veredas\n en mal\n estado'),
+                                      ActionWidget(
+                                          icon: Icons.report,
+                                          label:
+                                              'Personas\n en\n situación\n de calle'),
+                                      ActionWidget(
+                                          icon: Icons.report,
+                                          label: 'Reunión\n de\n hombres'),
+                                      ActionWidget(
+                                          icon: Icons.report,
+                                          label:
+                                              'Presencia\n de bares\n y\n restobar'),
                                     ],
                                   ),
                                 ],
                               ),
                             ],
                           ),
+                        ),
+                        actions: <Widget>[
                           TextButton(
                             onPressed: () {
-                              // Cerrar la ventana flotante cuando se presione el botón "Cerrar"
                               Navigator.of(context).pop();
                             },
-                            child: const Text('Cerrar'),
+                            child: Text('Cerrar'),
                           ),
                         ],
                       );
