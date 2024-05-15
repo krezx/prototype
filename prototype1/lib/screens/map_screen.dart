@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:prototype1/nav.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -49,6 +50,26 @@ class _MyHomePageState extends State<MyHomePage> {
     currentPosition = await _determinePosition();
   }
 
+  void shareLocationOnWhatsApp() async {
+    Position position = await _determinePosition();
+    // Número de teléfono al que se enviará el mensaje (incluido el prefijo internacional)
+    String phoneNumber = '+56930023656';
+
+    double latitud = position.latitude;
+    double longitude = position.longitude;
+
+    // Mensaje solicitando la ubicación actual
+    String message =
+        'https://www.google.cl/maps/search/$latitud,$longitude/?entry=tts';
+
+    // Construir la URL de WhatsApp con el número de teléfono y el mensaje
+    String whatsappUrl =
+        'https://wa.me/$phoneNumber/?text=${Uri.encodeFull(message)}';
+
+    // Verificar si la URL se puede abrir
+    await launch(whatsappUrl);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +95,9 @@ class _MyHomePageState extends State<MyHomePage> {
           FloatingActionButton(
             heroTag:
                 'shareButton', // Asigna una etiqueta única para el botón de compartir
-            onPressed: () {},
+            onPressed: () {
+              shareLocationOnWhatsApp();
+            },
             child: const Icon(Icons.share),
           ),
           const SizedBox(height: 16), // Espacio entre los botones flotantes
