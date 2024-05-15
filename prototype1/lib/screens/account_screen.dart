@@ -16,7 +16,7 @@ class Cuenta extends StatelessWidget {
         body: const Center(
           child: Text('Informacion de la cuenta...'),
         ),
-        drawer: MainDrawer(),
+        drawer: const MainDrawer(),
       ),
     );
   }

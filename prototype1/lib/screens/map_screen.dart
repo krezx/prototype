@@ -4,6 +4,7 @@ import 'package:prototype1/nav.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:sensors/sensors.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:geolocator/geolocator.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -82,11 +83,39 @@ dynamic ventanaSos(BuildContext context) {
 
 class _MyHomePageState extends State<MyHomePage> {
   late GoogleMapController mapController;
+  late Position currentPosition;
 
-  final LatLng _center = const LatLng(-29.9053048, -71.2634563);
+  @override
+  void initState() {
+    super.initState();
+  }
 
-  void _onMapCreated(GoogleMapController controller) {
+  Future<Position> _determinePosition() async {
+    LocationPermission permission;
+    permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('error');
+      }
+    }
+    return await Geolocator.getCurrentPosition();
+  }
+
+  void _onMapCreated(GoogleMapController controller) async {
+    currentPosition = await _determinePosition();
     mapController = controller;
+    mapController.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(
+        target: LatLng(currentPosition.latitude, currentPosition.longitude),
+        zoom: 15.0,
+      ),
+    ));
+  }
+
+  void _getCurrentLocation() async {
+    currentPosition = await _determinePosition();
   }
 
   @override
@@ -108,13 +137,15 @@ class _MyHomePageState extends State<MyHomePage> {
         title: const Text('Nombre App'),
         backgroundColor: const Color.fromARGB(100, 239, 66, 124),
       ),
-      drawer: MainDrawer(),
+      drawer: const MainDrawer(),
       body: GoogleMap(
         zoomControlsEnabled: false,
         onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: _center,
-          zoom: 14.0,
+        myLocationEnabled: true,
+        myLocationButtonEnabled: true,
+        initialCameraPosition: const CameraPosition(
+          target: LatLng(-29.9053048, -71.2634563),
+          zoom: 15.0,
         ),
       ),
       floatingActionButton: Column(

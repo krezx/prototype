@@ -16,7 +16,7 @@ class Ayuda extends StatelessWidget {
         body: const Center(
           child: Text('Información de Ayuda'),
         ),
-        drawer: MainDrawer(),
+        drawer: const MainDrawer(),
       ),
     );
   }
