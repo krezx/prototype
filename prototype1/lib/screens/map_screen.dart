@@ -66,12 +66,14 @@ dynamic ventanaSos(BuildContext context) {
   AudioPlayer audioPlayer = AudioPlayer();
   if (!_ventanaSosAbierta) {
     VolumeWatcher.setVolume(1.0);
+    audioPlayer.setReleaseMode(ReleaseMode.loop);
     audioPlayer.play(AssetSource('audio/sos-43210.mp3'));
     count = 0;
     _ventanaSosAbierta = true;
     // Mostrar la ventana flotante cuando se presione el botón
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('LLAMADA DE EMERGENCIA'),
@@ -255,6 +257,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   // Mostrar la ventana flotante cuando se presione el botón
                   showDialog(
                     context: context,
+                    barrierDismissible: false,
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: const Text(
