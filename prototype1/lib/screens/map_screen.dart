@@ -127,33 +127,9 @@ dynamic ventanaSos(BuildContext context) {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  // Mapa
   late GoogleMapController mapController;
   late Position currentPosition;
-
-  // Método para obtener el volumen inicial
-  Future<double> getInitialVolume() async {
-    return VolumeWatcher.getCurrentVolume;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Configura el listener para detectar la sacudida
-    int temp = 0;
-    accelerometerEvents.listen((AccelerometerEvent event) {
-      temp++;
-      if (!_ventanaSosAbierta &&
-          (event.x.abs() > 30 || event.y.abs() > 30 || event.z.abs() > 30)) {
-        print(count);
-        count++;
-      }
-      if (temp == 200) {
-        count = 0;
-        temp = 0;
-      }
-      if (count == 30) ventanaSos(context);
-    });
-  }
 
   Future<Position> _determinePosition() async {
     LocationPermission permission;
@@ -183,6 +159,33 @@ class _MyHomePageState extends State<MyHomePage> {
     currentPosition = await _determinePosition();
   }
 
+  // Método para obtener el volumen inicial
+  Future<double> getInitialVolume() async {
+    return VolumeWatcher.getCurrentVolume;
+  }
+
+  //    Shake
+  @override
+  void initState() {
+    super.initState();
+    // Configura el listener para detectar la sacudida
+    int temp = 0;
+    accelerometerEvents.listen((AccelerometerEvent event) {
+      temp++;
+      if (!_ventanaSosAbierta &&
+          (event.x.abs() > 30 || event.y.abs() > 30 || event.z.abs() > 30)) {
+        print(count);
+        count++;
+      }
+      if (temp == 200) {
+        count = 0;
+        temp = 0;
+      }
+      if (count == 30) ventanaSos(context);
+    });
+  }
+
+  //        Whatsapp
   void shareLocationOnWhatsApp() async {
     Position position = await _determinePosition();
     // Número de teléfono al que se enviará el mensaje (incluido el prefijo internacional)
