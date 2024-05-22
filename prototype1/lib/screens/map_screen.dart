@@ -129,6 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // Mapa
   late GoogleMapController mapController;
   late Position currentPosition;
+  late bool userposition = false;
 
   Future<Position> _determinePosition() async {
     LocationPermission permission;
@@ -140,6 +141,8 @@ class _MyHomePageState extends State<MyHomePage> {
         return Future.error('error');
       }
     }
+    //reiniciarVentana(); //*************************** error bucle */
+
     return await Geolocator.getCurrentPosition();
   }
 
@@ -152,6 +155,24 @@ class _MyHomePageState extends State<MyHomePage> {
         zoom: 15.0,
       ),
     ));
+  }
+
+  void _updateLocation() async {
+    Position newPosition = await _determinePosition();
+    setState(() {
+      currentPosition = newPosition;
+      mapController.animateCamera(CameraUpdate.newLatLng(
+          LatLng(currentPosition.latitude, currentPosition.longitude)));
+    });
+  }
+
+  void reiniciarVentana() {
+    print("holas"); // Cierra el Drawer
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (context) => const MyHomePage(title: 'Material App')),
+    );
   }
 
   void _getCurrentLocation() async {
@@ -167,9 +188,13 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+
     // Configura el listener para detectar la sacudida
     int temp = 0;
     accelerometerEvents.listen((AccelerometerEvent event) {
+      // if (userposition) {
+      //   _updateLocation();
+      // }
       temp++;
       if (!_ventanaSosAbierta &&
           (event.x.abs() > 30 || event.y.abs() > 30 || event.z.abs() > 30)) {
@@ -226,6 +251,16 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                userposition = !userposition;
+              });
+            },
+            child: Icon(userposition
+                ? Icons.location_searching
+                : Icons.location_disabled),
+          ),
           FloatingActionButton(
             heroTag:
                 'shareButton', // Asigna una etiqueta única para el botón de compartir
