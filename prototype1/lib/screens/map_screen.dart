@@ -63,13 +63,14 @@ dynamic ventanaSos(BuildContext context) {
   VolumeWatcher.getCurrentVolume.then((double volume) {
     _volumenInicial = volume;
   });
-  AudioPlayer audioPlayer = AudioPlayer();
   if (!_ventanaSosAbierta) {
+    _ventanaSosAbierta = true;
+    count = 0;
+    AudioPlayer audioPlayer = AudioPlayer();
+    // Configurar el contexto de audio para usar siempre el altavoz
     VolumeWatcher.setVolume(1.0);
     audioPlayer.setReleaseMode(ReleaseMode.loop);
     audioPlayer.play(AssetSource('audio/sos-43210.mp3'));
-    count = 0;
-    _ventanaSosAbierta = true;
     // Mostrar la ventana flotante cuando se presione el botón
     showDialog(
       context: context,
@@ -264,64 +265,68 @@ class _MyHomePageState extends State<MyHomePage> {
                           'REPORTE',
                           textAlign: TextAlign.center,
                         ),
-                        content: const SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      children: [
-                                        ActionWidget(
-                                            icon: Icons.report,
-                                            label: 'Agresión\n Verbal'),
-                                        ActionWidget(
-                                            icon: Icons.report,
-                                            label: 'Agresión\n Física'),
-                                        ActionWidget(
-                                            icon: Icons.report,
-                                            label: 'Poca\n Iluminación'),
-                                        ActionWidget(
-                                            icon: Icons.report,
-                                            label: 'Espacios\n Abandonados'),
-                                        ActionWidget(
-                                            icon: Icons.report,
-                                            label: 'Puntos\n Ciegos'),
-                                        ActionWidget(
-                                            icon: Icons.report,
-                                            label:
-                                                'Falta de\n baños\n públicos'),
-                                      ],
+                        content: const Scrollbar(
+                          thumbVisibility: true,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          ActionWidget(
+                                              icon: Icons.report,
+                                              label: 'Agresión\n Verbal'),
+                                          ActionWidget(
+                                              icon: Icons.report,
+                                              label: 'Agresión\n Física'),
+                                          ActionWidget(
+                                              icon: Icons.report,
+                                              label: 'Poca\n Iluminación'),
+                                          ActionWidget(
+                                              icon: Icons.report,
+                                              label: 'Espacios\n Abandonados'),
+                                          ActionWidget(
+                                              icon: Icons.report,
+                                              label: 'Puntos\n Ciegos'),
+                                          ActionWidget(
+                                              icon: Icons.report,
+                                              label:
+                                                  'Falta de\n baños\n públicos'),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      children: [
-                                        ActionWidget(
-                                            icon: Icons.report,
-                                            label: 'Mobiliario\n Inadecuado'),
-                                        ActionWidget(
-                                            icon: Icons.report,
-                                            label: 'Veredas\n en mal\n estado'),
-                                        ActionWidget(
-                                            icon: Icons.report,
-                                            label:
-                                                'Personas\n en\n situación\n de calle'),
-                                        ActionWidget(
-                                            icon: Icons.report,
-                                            label: 'Reunión\n de\n hombres'),
-                                        ActionWidget(
-                                            icon: Icons.report,
-                                            label:
-                                                'Presencia\n de bares\n y\n restobar'),
-                                      ],
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          ActionWidget(
+                                              icon: Icons.report,
+                                              label: 'Mobiliario\n Inadecuado'),
+                                          ActionWidget(
+                                              icon: Icons.report,
+                                              label:
+                                                  'Veredas\n en mal\n estado'),
+                                          ActionWidget(
+                                              icon: Icons.report,
+                                              label:
+                                                  'Personas\n en\n situación\n de calle'),
+                                          ActionWidget(
+                                              icon: Icons.report,
+                                              label: 'Reunión\n de\n hombres'),
+                                          ActionWidget(
+                                              icon: Icons.report,
+                                              label:
+                                                  'Presencia\n de bares\n y\n restobar'),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         actions: <Widget>[
