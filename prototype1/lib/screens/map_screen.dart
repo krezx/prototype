@@ -6,6 +6,7 @@ import 'package:sensors/sensors.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:volume_watcher/volume_watcher.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -26,8 +27,8 @@ class ActionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 150, // Ajusta el ancho según tus necesidades
-      height: 140, // Ajusta la altura según tus necesidades
+      width: 150,
+      height: 140,
       // padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
         // mainAxisAlignment: MainAxisAlignment.center,
@@ -58,8 +59,13 @@ _callNumber() async {
 }
 
 dynamic ventanaSos(BuildContext context) {
+  late double _volumenInicial;
+  VolumeWatcher.getCurrentVolume.then((double volume) {
+    _volumenInicial = volume;
+  });
   AudioPlayer audioPlayer = AudioPlayer();
   if (!_ventanaSosAbierta) {
+    VolumeWatcher.setVolume(1.0);
     audioPlayer.play(AssetSource('audio/sos-43210.mp3'));
     count = 0;
     _ventanaSosAbierta = true;
@@ -106,6 +112,7 @@ dynamic ventanaSos(BuildContext context) {
                 // Cerrar la ventana flotante cuando se presione el botón "Cerrar"
                 _ventanaSosAbierta = false;
                 audioPlayer.stop();
+                VolumeWatcher.setVolume(_volumenInicial);
                 Navigator.of(context).pop();
               },
               child: const Text('Cerrar'),
@@ -120,6 +127,11 @@ dynamic ventanaSos(BuildContext context) {
 class _MyHomePageState extends State<MyHomePage> {
   late GoogleMapController mapController;
   late Position currentPosition;
+
+  // Método para obtener el volumen inicial
+  Future<double> getInitialVolume() async {
+    return VolumeWatcher.getCurrentVolume;
+  }
 
   @override
   void initState() {
