@@ -25,16 +25,24 @@ class ActionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+    return Container(
+      width: 150, // Ajusta el ancho según tus necesidades
+      height: 140, // Ajusta la altura según tus necesidades
+      // padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
+        // mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           IconButton(
             onPressed: () {},
             icon: Icon(icon, size: 30),
           ),
           const SizedBox(height: 8),
-          Text(label, style: const TextStyle(fontSize: 15)),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 15),
+          ),
         ],
       ),
     );
@@ -245,49 +253,56 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: Column(
                             children: [
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Column(
-                                    children: [
-                                      ActionWidget(
-                                          icon: Icons.report,
-                                          label: 'Agresión\n Verbal'),
-                                      ActionWidget(
-                                          icon: Icons.report,
-                                          label: 'Agresión\n Física'),
-                                      ActionWidget(
-                                          icon: Icons.report,
-                                          label: 'Poca\n Iluminación'),
-                                      ActionWidget(
-                                          icon: Icons.report,
-                                          label: 'Espacios\n Abandonados'),
-                                      ActionWidget(
-                                          icon: Icons.report,
-                                          label: 'Puntos\n Ciegos'),
-                                      ActionWidget(
-                                          icon: Icons.report,
-                                          label: 'Falta de\n baños\n públicos'),
-                                    ],
+                                  Expanded(
+                                    child: Column(
+                                      children: [
+                                        ActionWidget(
+                                            icon: Icons.report,
+                                            label: 'Agresión\n Verbal'),
+                                        ActionWidget(
+                                            icon: Icons.report,
+                                            label: 'Agresión\n Física'),
+                                        ActionWidget(
+                                            icon: Icons.report,
+                                            label: 'Poca\n Iluminación'),
+                                        ActionWidget(
+                                            icon: Icons.report,
+                                            label: 'Espacios\n Abandonados'),
+                                        ActionWidget(
+                                            icon: Icons.report,
+                                            label: 'Puntos\n Ciegos'),
+                                        ActionWidget(
+                                            icon: Icons.report,
+                                            label:
+                                                'Falta de\n baños\n públicos'),
+                                      ],
+                                    ),
                                   ),
-                                  Column(
-                                    children: [
-                                      ActionWidget(
-                                          icon: Icons.report,
-                                          label: 'Mobiliario\n Inadecuado'),
-                                      ActionWidget(
-                                          icon: Icons.report,
-                                          label: 'Veredas\n en mal\n estado'),
-                                      ActionWidget(
-                                          icon: Icons.report,
-                                          label:
-                                              'Personas\n en\n situación\n de calle'),
-                                      ActionWidget(
-                                          icon: Icons.report,
-                                          label: 'Reunión\n de\n hombres'),
-                                      ActionWidget(
-                                          icon: Icons.report,
-                                          label:
-                                              'Presencia\n de bares\n y\n restobar'),
-                                    ],
+                                  Expanded(
+                                    child: Column(
+                                      children: [
+                                        ActionWidget(
+                                            icon: Icons.report,
+                                            label: 'Mobiliario\n Inadecuado'),
+                                        ActionWidget(
+                                            icon: Icons.report,
+                                            label: 'Veredas\n en mal\n estado'),
+                                        ActionWidget(
+                                            icon: Icons.report,
+                                            label:
+                                                'Personas\n en\n situación\n de calle'),
+                                        ActionWidget(
+                                            icon: Icons.report,
+                                            label: 'Reunión\n de\n hombres'),
+                                        ActionWidget(
+                                            icon: Icons.report,
+                                            label:
+                                                'Presencia\n de bares\n y\n restobar'),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
