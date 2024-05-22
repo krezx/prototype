@@ -21,12 +21,11 @@ class ActionWidget extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const ActionWidget({Key? key, required this.icon, required this.label})
-      : super(key: key);
+  const ActionWidget({super.key, required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 150,
       height: 140,
       // padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -174,7 +173,6 @@ class _MyHomePageState extends State<MyHomePage> {
       temp++;
       if (!_ventanaSosAbierta &&
           (event.x.abs() > 30 || event.y.abs() > 30 || event.z.abs() > 30)) {
-        print(count);
         count++;
       }
       if (temp == 200) {
