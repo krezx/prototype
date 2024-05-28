@@ -8,6 +8,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:volume_watcher/volume_watcher.dart';
 
+const LatLng _center = LatLng(-29.9053048, -71.2634563);
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
@@ -21,12 +23,11 @@ class ActionWidget extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const ActionWidget({Key? key, required this.icon, required this.label})
-      : super(key: key);
+  const ActionWidget({super.key, required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 150,
       height: 140,
       // padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -128,24 +129,82 @@ dynamic ventanaSos(BuildContext context) {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  //**************************** Mapa ******************************
   late GoogleMapController mapController;
   late Position currentPosition;
+  late bool userposition = false;
+  bool _hasLocationPermission = false;
+
+  LatLng _currentMapPosition = const LatLng(-29.9053048, -71.2634563);
+
+  Future<void> _checkLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if (permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always) {
+      setState(() {
+        _hasLocationPermission = true;
+      });
+    } else {
+      setState(() {
+        _hasLocationPermission = false;
+      });
+    }
+  }
+
+  void _onMapCreatedSinFunciones(GoogleMapController controller) {
+    mapController = controller;
+  }
+
+  void _onMapCreated(GoogleMapController controller) async {
+    mapController = controller;
+    Position position = await Geolocator.getCurrentPosition();
+    mapController.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(
+        target: LatLng(position.latitude, position.longitude),
+        zoom: 15.0,
+      ),
+    ));
+  }
+
+  void _onCameraMove(CameraPosition position) {
+    _currentMapPosition = position.target;
+  }
+
+  void _getCurrentPinLocation() {
+    // Muestra las coordenadas de la posición actual del pin (centro del mapa)
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Text(
+              "Lat: ${_currentMapPosition.latitude}, Lng: ${_currentMapPosition.longitude}"),
+        );
+      },
+    );
+  }
 
   // Método para obtener el volumen inicial
   Future<double> getInitialVolume() async {
     return VolumeWatcher.getCurrentVolume;
   }
 
+  //    Shake
   @override
   void initState() {
     super.initState();
+    _checkLocationPermission();
     // Configura el listener para detectar la sacudida
     int temp = 0;
     accelerometerEvents.listen((AccelerometerEvent event) {
+      // if (userposition) {
+      //   _updateLocation();
+      // }
       temp++;
       if (!_ventanaSosAbierta &&
           (event.x.abs() > 30 || event.y.abs() > 30 || event.z.abs() > 30)) {
-        print(count);
         count++;
       }
       if (temp == 200) {
@@ -156,45 +215,19 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<Position> _determinePosition() async {
-    LocationPermission permission;
-    permission = await Geolocator.checkPermission();
-
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('error');
-      }
-    }
-    return await Geolocator.getCurrentPosition();
-  }
-
-  void _onMapCreated(GoogleMapController controller) async {
-    currentPosition = await _determinePosition();
-    mapController = controller;
-    mapController.animateCamera(CameraUpdate.newCameraPosition(
-      CameraPosition(
-        target: LatLng(currentPosition.latitude, currentPosition.longitude),
-        zoom: 15.0,
-      ),
-    ));
-  }
-
-  void _getCurrentLocation() async {
-    currentPosition = await _determinePosition();
-  }
-
+  //        Whatsapp
   void shareLocationOnWhatsApp() async {
-    Position position = await _determinePosition();
+    Position position = await Geolocator.getCurrentPosition();
     // Número de teléfono al que se enviará el mensaje (incluido el prefijo internacional)
+    // se tiene que modificar segun los datos que tengamos del usuario
     String phoneNumber = '+56930023656';
 
     double latitud = position.latitude;
     double longitude = position.longitude;
 
     // Mensaje solicitando la ubicación actual
-    String message =
-        'https://www.google.cl/maps/search/$latitud,$longitude/?entry=tts';
+    String message = """Necesito ayuda esta es mi ultima ubicacion:
+        https://www.google.cl/maps/search/$latitud,$longitude/?entry=tts""";
 
     // Construir la URL de WhatsApp con el número de teléfono y el mensaje
     String whatsappUrl =
@@ -212,141 +245,175 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: const Color.fromARGB(100, 239, 66, 124),
       ),
       drawer: const MainDrawer(),
-      body: GoogleMap(
-        zoomControlsEnabled: false,
-        onMapCreated: _onMapCreated,
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
-        initialCameraPosition: const CameraPosition(
-          target: LatLng(-29.9053048, -71.2634563),
-          zoom: 15.0,
-        ),
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            heroTag:
-                'shareButton', // Asigna una etiqueta única para el botón de compartir
-            onPressed: () {
-              shareLocationOnWhatsApp();
-            },
-            child: const Icon(Icons.share),
-          ),
-          const SizedBox(height: 16), // Espacio entre los botones flotantes
-          FloatingActionButton(
-            heroTag:
-                'sosButton', // Asigna una etiqueta única para el botón de SOS
-            onPressed: () {
-              ventanaSos(context);
-            },
-            child: const Icon(Icons.sos),
-          ),
-          const SizedBox(height: 16), // Espacio entre los botones flotantes
-          FloatingActionButton(
-            heroTag:
-                'helpButton', // Asigna una etiqueta única para el botón de ayuda
-            onPressed: () {},
-            child: const Icon(Icons.help),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  // Mostrar la ventana flotante cuando se presione el botón
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text(
-                          'REPORTE',
-                          textAlign: TextAlign.center,
-                        ),
-                        content: const Scrollbar(
-                          thumbVisibility: true,
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
+      body: _hasLocationPermission
+          ? Stack(
+              children: <Widget>[
+                GoogleMap(
+                  zoomControlsEnabled: false,
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: const CameraPosition(
+                    target: _center,
+                    zoom: 15.0,
+                  ),
+                  onCameraMove: _onCameraMove,
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
+                ),
+                const Center(
+                  child: Icon(Icons.location_pin, color: Colors.red, size: 40),
+                ),
+              ],
+            )
+          : GoogleMap(
+              zoomControlsEnabled: false,
+              onMapCreated: _onMapCreatedSinFunciones,
+              initialCameraPosition: const CameraPosition(
+                target: _center,
+                zoom: 15.0,
+              ),
+            ),
+      floatingActionButton: _hasLocationPermission
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                FloatingActionButton(
+                  onPressed: _getCurrentPinLocation,
+                  tooltip: 'Get Location',
+                  child: const Icon(Icons.location_pin),
+                ),
+                const SizedBox(height: 16),
+                FloatingActionButton(
+                  heroTag:
+                      'shareButton', // Asigna una etiqueta única para el botón de compartir
+                  onPressed: () {
+                    shareLocationOnWhatsApp();
+                  },
+                  child: const Icon(Icons.share),
+                ),
+                const SizedBox(
+                    height: 16), // Espacio entre los botones flotantes
+                FloatingActionButton(
+                  heroTag:
+                      'sosButton', // Asigna una etiqueta única para el botón de SOS
+                  onPressed: () {
+                    ventanaSos(context);
+                  },
+                  child: const Icon(Icons.sos),
+                ),
+                const SizedBox(
+                    height: 16), // Espacio entre los botones flotantes
+                FloatingActionButton(
+                  heroTag:
+                      'helpButton', // Asigna una etiqueta única para el botón de ayuda
+                  onPressed: () {},
+                  child: const Icon(Icons.help),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        // Mostrar la ventana flotante cuando se presione el botón
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text(
+                                'REPORTE',
+                                textAlign: TextAlign.center,
+                              ),
+                              content: const Scrollbar(
+                                thumbVisibility: true,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          ActionWidget(
-                                              icon: Icons.report,
-                                              label: 'Agresión\n Verbal'),
-                                          ActionWidget(
-                                              icon: Icons.report,
-                                              label: 'Agresión\n Física'),
-                                          ActionWidget(
-                                              icon: Icons.report,
-                                              label: 'Poca\n Iluminación'),
-                                          ActionWidget(
-                                              icon: Icons.report,
-                                              label: 'Espacios\n Abandonados'),
-                                          ActionWidget(
-                                              icon: Icons.report,
-                                              label: 'Puntos\n Ciegos'),
-                                          ActionWidget(
-                                              icon: Icons.report,
-                                              label:
-                                                  'Falta de\n baños\n públicos'),
+                                          Expanded(
+                                            child: Column(
+                                              children: [
+                                                ActionWidget(
+                                                    icon: Icons.report,
+                                                    label: 'Agresión\n Verbal'),
+                                                ActionWidget(
+                                                    icon: Icons.report,
+                                                    label: 'Agresión\n Física'),
+                                                ActionWidget(
+                                                    icon: Icons.report,
+                                                    label:
+                                                        'Poca\n Iluminación'),
+                                                ActionWidget(
+                                                    icon: Icons.report,
+                                                    label:
+                                                        'Espacios\n Abandonados'),
+                                                ActionWidget(
+                                                    icon: Icons.report,
+                                                    label: 'Puntos\n Ciegos'),
+                                                ActionWidget(
+                                                    icon: Icons.report,
+                                                    label:
+                                                        'Falta de\n baños\n públicos'),
+                                              ],
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Column(
+                                              children: [
+                                                ActionWidget(
+                                                    icon: Icons.report,
+                                                    label:
+                                                        'Mobiliario\n Inadecuado'),
+                                                ActionWidget(
+                                                    icon: Icons.report,
+                                                    label:
+                                                        'Veredas\n en mal\n estado'),
+                                                ActionWidget(
+                                                    icon: Icons.report,
+                                                    label:
+                                                        'Personas\n en\n situación\n de calle'),
+                                                ActionWidget(
+                                                    icon: Icons.report,
+                                                    label:
+                                                        'Reunión\n de\n hombres'),
+                                                ActionWidget(
+                                                    icon: Icons.report,
+                                                    label:
+                                                        'Presencia\n de bares\n y\n restobar'),
+                                              ],
+                                            ),
+                                          ),
                                         ],
                                       ),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          ActionWidget(
-                                              icon: Icons.report,
-                                              label: 'Mobiliario\n Inadecuado'),
-                                          ActionWidget(
-                                              icon: Icons.report,
-                                              label:
-                                                  'Veredas\n en mal\n estado'),
-                                          ActionWidget(
-                                              icon: Icons.report,
-                                              label:
-                                                  'Personas\n en\n situación\n de calle'),
-                                          ActionWidget(
-                                              icon: Icons.report,
-                                              label: 'Reunión\n de\n hombres'),
-                                          ActionWidget(
-                                              icon: Icons.report,
-                                              label:
-                                                  'Presencia\n de bares\n y\n restobar'),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('Cerrar'),
                                 ),
                               ],
-                            ),
-                          ),
-                        ),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('Cerrar'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-                child: const Text('REPORTE', style: TextStyle(fontSize: 20)),
-              ),
-            ],
-          ),
-        ],
-      ),
+                            );
+                          },
+                        );
+                      },
+                      child:
+                          const Text('REPORTE', style: TextStyle(fontSize: 20)),
+                    ),
+                  ],
+                ),
+              ],
+            )
+          : null,
     );
   }
 }
