@@ -11,7 +11,7 @@ import 'package:volume_watcher/volume_watcher.dart';
 const LatLng _center = LatLng(-29.9053048, -71.2634563);
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -22,21 +22,28 @@ class MyHomePage extends StatefulWidget {
 class ActionWidget extends StatelessWidget {
   final IconData icon;
   final String label;
+  final Function selectCurrentLocation;
 
-  const ActionWidget({super.key, required this.icon, required this.label});
+  const ActionWidget({
+    Key? key,
+    required this.icon,
+    required this.label,
+    required this.selectCurrentLocation,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: 150,
       height: 140,
-      // padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
-        // mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pop();
+              _showReportDialog(context, label, selectCurrentLocation);
+            },
             icon: Icon(icon, size: 30),
           ),
           const SizedBox(height: 8),
@@ -44,11 +51,178 @@ class ActionWidget extends StatelessWidget {
             label,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 15),
+            overflow: TextOverflow
+                .visible, // Permite que el texto haga salto de línea si es necesario
+            softWrap:
+                true, // Permite que el texto haga salto de línea si es necesario
           ),
         ],
       ),
     );
   }
+
+  void _showReportDialog(
+      BuildContext context, String reportType, Function selectCurrentLocation) {
+    TextEditingController descriptionController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title:
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _ventanaReportes(context, selectCurrentLocation);
+              },
+            ),
+            Flexible(
+              // Agregamos Flexible para que el texto se ajuste correctamente
+              child: Text(
+                'Reporte de $reportType',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ]),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Descripción:'),
+              TextField(
+                controller: descriptionController,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  hintText: 'Ingrese una descripción (opcional)',
+                ),
+              ),
+              const SizedBox(
+                  height:
+                      20), // Añade un espacio entre la descripción y los botones
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      selectCurrentLocation();
+                      Navigator.of(context)
+                          .pop(); // Cierra el diálogo de reporte
+                    },
+                    child: const Text('Seleccionar Ubicación Actual'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pop(); // Cierra el diálogo de reporte
+                    },
+                    child: const Text('Seleccionar Ubicación en Mapa'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+void _ventanaReportes(BuildContext context, Function selectCurrentLocation) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('REPORTE', textAlign: TextAlign.center),
+        content: Scrollbar(
+          thumbVisibility: true,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          ActionWidget(
+                              icon: Icons.report,
+                              label: 'Agresión Verbal',
+                              selectCurrentLocation: selectCurrentLocation),
+                          ActionWidget(
+                              icon: Icons.report,
+                              label: 'Agresión Física',
+                              selectCurrentLocation: selectCurrentLocation),
+                          ActionWidget(
+                              icon: Icons.report,
+                              label: 'Poca Iluminación',
+                              selectCurrentLocation: selectCurrentLocation),
+                          ActionWidget(
+                              icon: Icons.report,
+                              label: 'Espacios Abandonados',
+                              selectCurrentLocation: selectCurrentLocation),
+                          ActionWidget(
+                              icon: Icons.report,
+                              label: 'Puntos Ciegos',
+                              selectCurrentLocation: selectCurrentLocation),
+                          ActionWidget(
+                              icon: Icons.report,
+                              label: 'Falta de baños públicos',
+                              selectCurrentLocation: selectCurrentLocation),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          ActionWidget(
+                              icon: Icons.report,
+                              label: 'Mobiliario Inadecuado',
+                              selectCurrentLocation: selectCurrentLocation),
+                          ActionWidget(
+                              icon: Icons.report,
+                              label: 'Veredas en mal estado',
+                              selectCurrentLocation: selectCurrentLocation),
+                          ActionWidget(
+                              icon: Icons.report,
+                              label: 'Personas en situación de calle',
+                              selectCurrentLocation: selectCurrentLocation),
+                          ActionWidget(
+                              icon: Icons.report,
+                              label: 'Reunión de hombres',
+                              selectCurrentLocation: selectCurrentLocation),
+                          ActionWidget(
+                              icon: Icons.report,
+                              label: 'Presencia de  bares y restobar',
+                              selectCurrentLocation: selectCurrentLocation),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cerrar'),
+          ),
+        ],
+      );
+    },
+  );
 }
 
 bool _ventanaSosAbierta = false;
@@ -186,6 +360,14 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void _selectCurrentLocation() async {
+    Position position = await Geolocator.getCurrentPosition();
+    setState(() {
+      _currentMapPosition = LatLng(position.latitude, position.longitude);
+    });
+    mapController.animateCamera(CameraUpdate.newLatLng(_currentMapPosition));
+  }
+
   // Método para obtener el volumen inicial
   Future<double> getInitialVolume() async {
     return VolumeWatcher.getCurrentVolume;
@@ -314,97 +496,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        // Mostrar la ventana flotante cuando se presione el botón
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text(
-                                'REPORTE',
-                                textAlign: TextAlign.center,
-                              ),
-                              content: const Scrollbar(
-                                thumbVisibility: true,
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: Column(
-                                              children: [
-                                                ActionWidget(
-                                                    icon: Icons.report,
-                                                    label: 'Agresión\n Verbal'),
-                                                ActionWidget(
-                                                    icon: Icons.report,
-                                                    label: 'Agresión\n Física'),
-                                                ActionWidget(
-                                                    icon: Icons.report,
-                                                    label:
-                                                        'Poca\n Iluminación'),
-                                                ActionWidget(
-                                                    icon: Icons.report,
-                                                    label:
-                                                        'Espacios\n Abandonados'),
-                                                ActionWidget(
-                                                    icon: Icons.report,
-                                                    label: 'Puntos\n Ciegos'),
-                                                ActionWidget(
-                                                    icon: Icons.report,
-                                                    label:
-                                                        'Falta de\n baños\n públicos'),
-                                              ],
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Column(
-                                              children: [
-                                                ActionWidget(
-                                                    icon: Icons.report,
-                                                    label:
-                                                        'Mobiliario\n Inadecuado'),
-                                                ActionWidget(
-                                                    icon: Icons.report,
-                                                    label:
-                                                        'Veredas\n en mal\n estado'),
-                                                ActionWidget(
-                                                    icon: Icons.report,
-                                                    label:
-                                                        'Personas\n en\n situación\n de calle'),
-                                                ActionWidget(
-                                                    icon: Icons.report,
-                                                    label:
-                                                        'Reunión\n de\n hombres'),
-                                                ActionWidget(
-                                                    icon: Icons.report,
-                                                    label:
-                                                        'Presencia\n de bares\n y\n restobar'),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('Cerrar'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
+                        _ventanaReportes(context, _selectCurrentLocation);
                       },
                       child:
                           const Text('REPORTE', style: TextStyle(fontSize: 20)),

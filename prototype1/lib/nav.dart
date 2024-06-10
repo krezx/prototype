@@ -6,6 +6,7 @@ import 'package:prototype1/screens/map_screen.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -13,11 +14,25 @@ class MainDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Color.fromARGB(100, 239, 66, 124),
+          Container(
+            alignment: Alignment.center,
+            child: const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                UserAccountsDrawerHeader(
+                  accountName: Text("John Doe"),
+                  accountEmail: Text("john.doe@example.com"),
+                  currentAccountPicture: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: FlutterLogo(size: 42.0),
+                  ),
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(100, 239, 66, 124),
+                  ),
+                ),
+              ],
             ),
-            child: Text('Menú'),
           ),
           ListTile(
             leading: const Icon(Icons.map),
@@ -34,7 +49,7 @@ class MainDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.person_2),
+            leading: const Icon(Icons.person),
             title: const Text('Cuenta'),
             onTap: () {
               // Acción cuando se selecciona la opción 2
