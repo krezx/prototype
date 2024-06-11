@@ -313,6 +313,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late Position currentPosition;
   late bool userposition = false;
   bool _hasLocationPermission = false;
+  bool mostrarIcono = false;
 
   LatLng _currentMapPosition = const LatLng(-29.9053048, -71.2634563);
 
@@ -346,6 +347,9 @@ class _MyHomePageState extends State<MyHomePage> {
         zoom: 15.0,
       ),
     ));
+    setState(() {
+      mostrarIcono = false; // Establecer mostrarIcono como false
+    });
   }
 
   void _onCameraMove(CameraPosition position) {
@@ -369,6 +373,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Position position = await Geolocator.getCurrentPosition();
     setState(() {
       _currentMapPosition = LatLng(position.latitude, position.longitude);
+      mostrarIcono = true; // Establecer mostrarIcono como true
     });
     mapController.animateCamera(CameraUpdate.newLatLng(_currentMapPosition));
   }
@@ -447,9 +452,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
                 ),
-                // const Center(
-                //   child: Icon(Icons.location_pin, color: Colors.red, size: 40),
-                // ),
+                Center(
+                  child: Visibility(
+                    visible: mostrarIcono,
+                    child: const Icon(Icons.location_pin,
+                        color: Colors.red, size: 40),
+                  ),
+                ),
               ],
             )
           : GoogleMap(
@@ -518,6 +527,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
+                          mostrarIcono =
+                              false; // Establecer mostrarIcono como false
                           mapaReporte = false; // Cambia mapaReporte a false
                         });
                       },
@@ -528,6 +539,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
+                          mostrarIcono =
+                              false; // Establecer mostrarIcono como false
                           mapaReporte = false; // Cambia mapaReporte a false
                         });
                       },
