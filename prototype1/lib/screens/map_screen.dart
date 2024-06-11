@@ -11,7 +11,7 @@ import 'package:volume_watcher/volume_watcher.dart';
 const LatLng _center = LatLng(-29.9053048, -71.2634563);
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({super.key, required this.title});
 
   final String title;
 
@@ -25,11 +25,11 @@ class ActionWidget extends StatelessWidget {
   final Function selectCurrentLocation;
 
   const ActionWidget({
-    Key? key,
+    super.key,
     required this.icon,
     required this.label,
     required this.selectCurrentLocation,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +71,7 @@ class ActionWidget extends StatelessWidget {
           title:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             IconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back),
               onPressed: () {
                 Navigator.of(context).pop();
                 _ventanaReportes(context, selectCurrentLocation);
@@ -112,6 +112,8 @@ class ActionWidget extends StatelessWidget {
                   ),
                   ElevatedButton(
                     onPressed: () {
+                      selectCurrentLocation();
+                      mapaReporte = true;
                       Navigator.of(context)
                           .pop(); // Cierra el diálogo de reporte
                     },
@@ -230,13 +232,14 @@ int count = 0;
 
 _callNumber() async {
   const number = '9 30023656';
+  // ignore: unused_local_variable
   bool? res = await FlutterPhoneDirectCaller.callNumber(number);
 }
 
 dynamic ventanaSos(BuildContext context) {
-  late double _volumenInicial;
+  late double volumenInicial;
   VolumeWatcher.getCurrentVolume.then((double volume) {
-    _volumenInicial = volume;
+    volumenInicial = volume;
   });
   if (!_ventanaSosAbierta) {
     _ventanaSosAbierta = true;
@@ -290,7 +293,7 @@ dynamic ventanaSos(BuildContext context) {
                 // Cerrar la ventana flotante cuando se presione el botón "Cerrar"
                 _ventanaSosAbierta = false;
                 audioPlayer.stop();
-                VolumeWatcher.setVolume(_volumenInicial);
+                VolumeWatcher.setVolume(volumenInicial);
                 Navigator.of(context).pop();
               },
               child: const Text('Cerrar'),
@@ -301,6 +304,8 @@ dynamic ventanaSos(BuildContext context) {
     );
   }
 }
+
+bool mapaReporte = false;
 
 class _MyHomePageState extends State<MyHomePage> {
   //**************************** Mapa ******************************
@@ -416,6 +421,7 @@ class _MyHomePageState extends State<MyHomePage> {
         'https://wa.me/$phoneNumber/?text=${Uri.encodeFull(message)}';
 
     // Verificar si la URL se puede abrir
+    // ignore: deprecated_member_use
     await launch(whatsappUrl);
   }
 
@@ -441,9 +447,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
                 ),
-                const Center(
-                  child: Icon(Icons.location_pin, color: Colors.red, size: 40),
-                ),
+                // const Center(
+                //   child: Icon(Icons.location_pin, color: Colors.red, size: 40),
+                // ),
               ],
             )
           : GoogleMap(
@@ -454,17 +460,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 zoom: 15.0,
               ),
             ),
-      floatingActionButton: _hasLocationPermission
+      floatingActionButton: _hasLocationPermission && !mapaReporte
           ? Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                FloatingActionButton(
-                  onPressed: _getCurrentPinLocation,
-                  tooltip: 'Get Location',
-                  child: const Icon(Icons.location_pin),
-                ),
-                const SizedBox(height: 16),
+                // FloatingActionButton(
+                //   onPressed: _getCurrentPinLocation,
+                //   tooltip: 'Get Location',
+                //   child: const Icon(Icons.location_pin),
+                // ),
+                // const SizedBox(height: 16),
                 FloatingActionButton(
                   heroTag:
                       'shareButton', // Asigna una etiqueta única para el botón de compartir
@@ -505,7 +511,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             )
-          : null,
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    mapaReporte = false;
+                    _ventanaReportes(context, _selectCurrentLocation);
+                  },
+                  child: const Text('CANCELAR', style: TextStyle(fontSize: 20)),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    mapaReporte = false;
+                    _ventanaReportes(context, _selectCurrentLocation);
+                  },
+                  child: const Text('ENVIAR', style: TextStyle(fontSize: 20)),
+                ),
+              ],
+            ),
     );
   }
 }
