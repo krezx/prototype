@@ -511,26 +511,46 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    mapaReporte = false;
-                    _ventanaReportes(context, _selectCurrentLocation);
-                  },
-                  child: const Text('CANCELAR', style: TextStyle(fontSize: 20)),
+          : mapaReporte
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          mapaReporte = false; // Cambia mapaReporte a false
+                        });
+                      },
+                      child: const Text('CANCELAR',
+                          style: TextStyle(fontSize: 20)),
+                    ),
+                    const SizedBox(width: 10), // Agrega un espacio entre lo
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          mapaReporte = false; // Cambia mapaReporte a false
+                        });
+                      },
+                      child:
+                          const Text('ENVIAR', style: TextStyle(fontSize: 20)),
+                    ),
+                  ],
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          mapaReporte = true; // Cambia mapaReporte a true
+                        });
+                        _ventanaReportes(context, _selectCurrentLocation);
+                      },
+                      child:
+                          const Text('REPORTE', style: TextStyle(fontSize: 20)),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    mapaReporte = false;
-                    _ventanaReportes(context, _selectCurrentLocation);
-                  },
-                  child: const Text('ENVIAR', style: TextStyle(fontSize: 20)),
-                ),
-              ],
-            ),
     );
   }
 }
