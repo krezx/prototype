@@ -7,8 +7,17 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:volume_watcher/volume_watcher.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geoflutterfire2/geoflutterfire2.dart';
 
 const LatLng _center = LatLng(-29.9053048, -71.2634563);
+bool mapaReporte = false;
+bool mostrarIcono = false;
+bool _ventanaSosAbierta = false;
+int count = 0;
+String desc = "";
+String type = "";
+bool actual = false;
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -64,6 +73,7 @@ class ActionWidget extends StatelessWidget {
   void _showReportDialog(
       BuildContext context, String reportType, Function selectCurrentLocation) {
     TextEditingController descriptionController = TextEditingController();
+    type = reportType;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -104,6 +114,7 @@ class ActionWidget extends StatelessWidget {
                 children: [
                   ElevatedButton(
                     onPressed: () {
+                      actual = true;
                       selectCurrentLocation();
                       Navigator.of(context)
                           .pop(); // Cierra el diálogo de reporte
@@ -114,6 +125,7 @@ class ActionWidget extends StatelessWidget {
                     onPressed: () {
                       selectCurrentLocation();
                       mapaReporte = true;
+                      mostrarIcono = true;
                       Navigator.of(context)
                           .pop(); // Cierra el diálogo de reporte
                     },
@@ -133,7 +145,10 @@ class ActionWidget extends StatelessWidget {
           ],
         );
       },
-    );
+    ).then((value) {
+      // Asigna la descripción cuando se cierra el diálogo
+      desc = descriptionController.text;
+    });
   }
 }
 
@@ -227,9 +242,6 @@ void _ventanaReportes(BuildContext context, Function selectCurrentLocation) {
   );
 }
 
-bool _ventanaSosAbierta = false;
-int count = 0;
-
 _callNumber() async {
   const number = '9 30023656';
   // ignore: unused_local_variable
@@ -305,15 +317,15 @@ dynamic ventanaSos(BuildContext context) {
   }
 }
 
-bool mapaReporte = false;
-
 class _MyHomePageState extends State<MyHomePage> {
+  final geo = GeoFlutterFire();
+  final firestore = FirebaseFirestore.instance;
+
   //**************************** Mapa ******************************
   late GoogleMapController mapController;
   late Position currentPosition;
   late bool userposition = false;
   bool _hasLocationPermission = false;
-  bool mostrarIcono = false;
 
   LatLng _currentMapPosition = const LatLng(-29.9053048, -71.2634563);
 
@@ -332,6 +344,45 @@ class _MyHomePageState extends State<MyHomePage> {
         _hasLocationPermission = false;
       });
     }
+  }
+
+  void agregarIncidencia(String descripcion, String tipo, double lat,
+      double lon, String usuarioId) {
+    GeoFirePoint geoFirePoint = geo.point(latitude: lat, longitude: lon);
+
+    firestore.collection('incidencias').add({
+      'descripcion': descripcion,
+      'tipo': tipo,
+      'fechaReporte': FieldValue.serverTimestamp(),
+      'ubicacion': geoFirePoint.data,
+      'usuarioId': usuarioId,
+    }).then((DocumentReference docRef) {
+      print("Incidencia añadida con ID: ${docRef.id}");
+    }).catchError((error) {
+      print("Error al añadir incidencia: $error");
+    });
+  }
+
+  Future<void> getIncidenciasCercanas(
+      double lat, double lon, double radioEnKm) async {
+    GeoFirePoint center = geo.point(latitude: lat, longitude: lon);
+
+    var collectionReference = firestore.collection('incidencias');
+    String field = 'ubicacion';
+
+    Stream<List<DocumentSnapshot>> stream =
+        geo.collection(collectionRef: collectionReference).within(
+              center: center,
+              radius: radioEnKm,
+              field: field,
+              strictMode: true,
+            );
+
+    stream.listen((List<DocumentSnapshot> documentList) {
+      documentList.forEach((DocumentSnapshot document) {
+        print(document.data());
+      });
+    });
   }
 
   void _onMapCreatedSinFunciones(GoogleMapController controller) {
@@ -358,6 +409,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _getCurrentPinLocation() {
     // Muestra las coordenadas de la posición actual del pin (centro del mapa)
+    agregarIncidencia(desc, type, _currentMapPosition.latitude,
+        _currentMapPosition.longitude, "user1");
     showDialog(
       context: context,
       builder: (context) {
@@ -371,9 +424,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _selectCurrentLocation() async {
     Position position = await Geolocator.getCurrentPosition();
+
+    if (actual == true) {
+      agregarIncidencia(
+          desc, type, position.latitude, position.longitude, "userejemplo");
+      actual = false;
+    }
+
     setState(() {
       _currentMapPosition = LatLng(position.latitude, position.longitude);
-      mostrarIcono = true; // Establecer mostrarIcono como true
     });
     mapController.animateCamera(CameraUpdate.newLatLng(_currentMapPosition));
   }
@@ -539,9 +598,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
+                          _getCurrentPinLocation();
                           mostrarIcono =
                               false; // Establecer mostrarIcono como false
                           mapaReporte = false; // Cambia mapaReporte a false
+                          desc = "";
+                          type = "";
                         });
                       },
                       child:
