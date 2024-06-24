@@ -328,6 +328,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _hasLocationPermission = false;
 
   LatLng _currentMapPosition = const LatLng(-29.9053048, -71.2634563);
+  late List<DocumentSnapshot> incidencias = [];
 
   Future<void> _checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -360,28 +361,6 @@ class _MyHomePageState extends State<MyHomePage> {
       print("Incidencia añadida con ID: ${docRef.id}");
     }).catchError((error) {
       print("Error al añadir incidencia: $error");
-    });
-  }
-
-  Future<void> getIncidenciasCercanas(
-      double lat, double lon, double radioEnKm) async {
-    GeoFirePoint center = geo.point(latitude: lat, longitude: lon);
-
-    var collectionReference = firestore.collection('incidencias');
-    String field = 'ubicacion';
-
-    Stream<List<DocumentSnapshot>> stream =
-        geo.collection(collectionRef: collectionReference).within(
-              center: center,
-              radius: radioEnKm,
-              field: field,
-              strictMode: true,
-            );
-
-    stream.listen((List<DocumentSnapshot> documentList) {
-      documentList.forEach((DocumentSnapshot document) {
-        print(document.data());
-      });
     });
   }
 
@@ -442,10 +421,39 @@ class _MyHomePageState extends State<MyHomePage> {
     return VolumeWatcher.getCurrentVolume;
   }
 
+  void getIncidencias() {
+    firestore
+        .collection('incidencias')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      setState(() {
+        incidencias = querySnapshot.docs;
+      });
+      print('Incidencias cargadas: ${incidencias.length}');
+    }).catchError((error) {
+      print("Error al cargar incidencias: $error");
+    });
+  }
+
+  Set<Marker> getMarkers() {
+    return incidencias.map((DocumentSnapshot incidencia) {
+      GeoPoint point = incidencia['ubicacion']['geopoint'];
+      return Marker(
+        markerId: MarkerId(incidencia.id),
+        position: LatLng(point.latitude, point.longitude),
+        infoWindow: InfoWindow(
+          title: incidencia['tipo'],
+          snippet: incidencia['descripcion'],
+        ),
+      );
+    }).toSet();
+  }
+
   //    Shake
   @override
   void initState() {
     super.initState();
+    getIncidencias();
     _checkLocationPermission();
     // Configura el listener para detectar la sacudida
     int temp = 0;
@@ -510,6 +518,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   onCameraMove: _onCameraMove,
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
+                  markers: getMarkers(),
                 ),
                 Center(
                   child: Visibility(
